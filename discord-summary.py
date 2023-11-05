@@ -1,11 +1,13 @@
 import asyncio
 import concurrent.futures
-import discord
 import functools
-import openai
-from datetime import datetime, timedelta
-from discord.ext import commands
 import os
+import re
+from datetime import datetime, timedelta
+
+import discord
+import openai
+from discord.ext import commands
 
 openai.api_key = os.environ['OPENAI_API_KEY']
 bot = commands.Bot(command_prefix='/', intents=discord.Intents.all())
@@ -15,6 +17,7 @@ bot = commands.Bot(command_prefix='/', intents=discord.Intents.all())
 async def get_summary(messages_context, messages_in_channel):
     print("Getting summary for: " + messages_in_channel[:50])
 
+    # return messages_in_channel
     # Define the synchronous function for the API call
     def synchronous_api_call():
         completion = openai.ChatCompletion.create(
@@ -40,22 +43,35 @@ async def on_ready():
     print(f'Logged in as {bot.user.name} ({bot.user.id})')
 
 
+def parse_time_to_look_back(time_period):
+    # Use regular expression to parse the time period
+    match = re.match(r'(\d+)([dhm])$', time_period)
+    if not match:
+        raise ValueError("Invalid time period format. Please use the format '<number><d/h/m>' (e.g., '1d', '6h', '30m').")
+
+    quantity, unit = match.groups()
+    quantity = int(quantity)
+
+    if unit == 'd':
+        return datetime.now() - timedelta(days=quantity)
+    elif unit == 'h':
+        return datetime.now() - timedelta(hours=quantity)
+    elif unit == 'm':
+        return datetime.now() - timedelta(minutes=quantity)
+    else:
+        raise ValueError("Invalid time unit. Use 'd' for days, 'h' for hours, or 'm' for minutes.")
+
+
 @bot.command()
 async def summary(ctx, time_period: str = "1d"):
     if time_period == "debug":
         time_to_look_back = datetime.utcnow() - timedelta(hours=6)
-    elif time_period == "6h":
-        time_to_look_back = datetime.utcnow() - timedelta(hours=6)
-    elif time_period == "1d":
-        time_to_look_back = datetime.utcnow() - timedelta(days=1)
     else:
-        await ctx.send("Invalid time period. Please use either '6h' or '1d'.")
-        return
+        time_to_look_back = parse_time_to_look_back(time_period)
 
     time_to_look_back_for_context = datetime.utcnow() - timedelta(days=3)
 
     for channel in ctx.guild.text_channels:
-        # not summary channel
         if channel.permissions_for(ctx.guild.me).read_messages and channel.name != "summary":
             channel_messages = []
             async for msg in channel.history(after=time_to_look_back):

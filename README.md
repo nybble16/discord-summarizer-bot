@@ -7,6 +7,7 @@
 - Summarizes Discord channel messages over a specified time period.
 - Uses OpenAI's GPT-4 for accurate and coherent summaries.
 - Easy to deploy and use within any Discord server.
+- Customizable summary timeframes.
 
 ## Installation
 
@@ -34,7 +35,8 @@ To install and run `discord-summarizer-bot` on your server, follow these steps:
 
 After inviting the bot to your Discord server, you can use the following commands:
 
-- `/summary`: Summarizes the last day's messages in all channels.
+- `/summary 1d`: Summarizes the last day's messages in all channels.
+- `/summary 6h`: Summarizes the last 6 hours' messages in all channels.
 
 ## Configuration
 
