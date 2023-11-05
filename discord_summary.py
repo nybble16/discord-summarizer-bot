@@ -9,8 +9,11 @@ import discord
 import openai
 from discord.ext import commands
 
+from async_lru_cache import AsyncLRUCache
+
 openai.api_key = os.environ['OPENAI_API_KEY']
 bot = commands.Bot(command_prefix='/', intents=discord.Intents.all())
+cache = AsyncLRUCache()
 
 
 @functools.lru_cache(maxsize=100)
@@ -18,6 +21,7 @@ async def get_summary(messages_context, messages_in_channel):
     print("Getting summary for: " + messages_in_channel[:50])
 
     # return messages_in_channel
+
     # Define the synchronous function for the API call
     def synchronous_api_call():
         completion = openai.ChatCompletion.create(
@@ -36,6 +40,17 @@ async def get_summary(messages_context, messages_in_channel):
         result = await asyncio.get_event_loop().run_in_executor(executor, synchronous_api_call)
 
     return result
+
+
+async def get_cached_summary(channel_context, channel_messages):
+    key = (tuple(channel_context), tuple(channel_messages))
+    cached_result = await cache.get(key)
+    if cached_result is not None:
+        return cached_result
+    else:
+        result = await get_summary(channel_context, channel_messages)
+        await cache.set(key, result)
+        return result
 
 
 @bot.event
@@ -85,7 +100,7 @@ async def summary(ctx, time_period: str = "1d"):
                         channel_context.append(f"{msg.author.display_name}: {msg.content}")
 
                 response = f"**<#{channel.id}>**\n"  # This makes the channel name clickable
-                response += await get_summary("\n".join(channel_context), "\n".join(channel_messages))
+                response += await get_cached_summary("\n".join(channel_context), "\n".join(channel_messages))
 
                 response_chunks = [response[i:i + 1900] for i in range(0, len(response), 1900)]
                 if time_period == "debug":
