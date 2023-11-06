@@ -10,7 +10,6 @@ async def call_openai_summarize(messages_context, messages_in_channel):
 
     # return messages_in_channel
 
-    # Define the synchronous function for the API call
     completion = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[

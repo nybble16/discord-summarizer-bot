@@ -22,33 +22,43 @@ To install and run `discord-summarizer-bot` on your server, follow these steps:
    cd discord-summarizer-bot
    pip install -r requirements.txt
    ```
-3. Set up your environment variables:
+3. To get your `discord-summarizer-bot` up and running, you'll need to configure your API keys as follows:
+   1. OpenAI API Key 
+      - Go to [OpenAI's API platform](https://beta.openai.com/signup/) and sign up for an account if you haven't already. 
+      - Once you have an account, navigate to the API section and generate a new API key. 
+      - Set the API key as an environment variable:
+        ```bash
+        export OPENAI_API_KEY='your_openai_api_key'
+   2. Discord Bot Token
+      - Head over to the [Discord Developer Portal](https://discord.com/developers/applications).
+      - Create a new application and add a bot to it.
+      - Under the "Bot" section, find and copy your bot token.
+      - Set the token as an environment variable:
+         ```bash
+         export DISCORD_SUMMARY_BOT_TOKEN='your_discord_bot_token'
+4. Confirm that the environment variables are set up:
     - `OPENAI_API_KEY`: Your OpenAI API key.
     - `DISCORD_SUMMARY_BOT_TOKEN`: Your Discord bot token.
 
-4. Run the bot:
+5. Run the bot:
    ```bash
    python bot.py
-   ```
 
 ## Usage
 
 After inviting the bot to your Discord server, you can use the following commands:
 
-- `/summary 1d`: Summarizes the last day's messages in all channels.
+- `/summary`: Summarizes the last day's messages in all channels.
+- `/summary 2d`: Summarizes the last 2 days' messages in all channels.
 - `/summary 6h`: Summarizes the last 6 hours' messages in all channels.
+- `/summary 5m`: Summarizes the last 5 minutes' messages in all channels.
 
-## Configuration
-
-You can configure the bot further by editing the `config.py` file (if you have one) or directly within the bot's code to adjust the summary length, targeted channels, and more.
 
 ## Contributing
 
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-
-Don't forget to give the project a star! Thanks again!
 
 ## License
 
