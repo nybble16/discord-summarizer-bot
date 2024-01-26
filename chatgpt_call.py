@@ -6,16 +6,17 @@ cache = AsyncLRUCache()
 
 
 async def call_openai_summarize(messages_context, messages_in_channel):
-    print("Getting summary for: " + messages_in_channel[:50])
+    print("Getting summary for: " + messages_in_channel)
 
     # return messages_in_channel
 
     completion = openai.ChatCompletion.create(
-        model="gpt-4-1106-preview",
+        # model="gpt-4-1106-preview",
+        model="gpt-4",
         messages=[
             {
                 "role": "assistant",
-                "content": f"Oto kontekst rozmowy na czacie: \n\n{'-' * 10}\n{messages_context}\n{'-' * 10}\n\n>>> Poniżej znajduje się kontynuacja, i tę kontynuację chciałbym abyś streścił znając powyższy kontekst: \n\n\n{messages_in_channel}"
+                "content": f"Poproszę Cię o streszcze rozmowy na czacie. Najpierw podam Ci kontekst rozmowy, abyś mógł w lepszy sposób zrozumieć o czym jest rozmowa, a potem napiszę kontynuację, o której streszczenie i zaznaczenie najważniejszych punktów Cię poproszę.\nOto kontekst: \n\n{'-' * 10}\n{messages_context}\n{'-' * 10}\n\n>>>A teraz proszę streść i pogrubiając najważniejsze elementy poniższej rozmowy:\n\n\n{messages_in_channel}"
             }
         ]
     )
